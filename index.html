@@ -1,0 +1,217 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Kalkulator BMI Pintar</title>
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: #e0f7fa;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            margin: 0;
+            padding: 20px;
+            box-sizing: border-box;
+        }
+        .kardus-aplikasi {
+            background-color: white;
+            padding: 30px;
+            border-radius: 12px;
+            box-shadow: 0 8px 20px rgba(0,0,0,0.15);
+            width: 100%;
+            max-width: 400px;
+        }
+        h2 {
+            color: #00796b;
+            text-align: center;
+            margin-top: 0;
+            margin-bottom: 20px;
+        }
+        .grup-input {
+            margin-bottom: 15px;
+        }
+        label {
+            display: block;
+            margin-bottom: 5px;
+            color: #444;
+            font-weight: 600;
+            font-size: 14px;
+        }
+        input, select {
+            width: 100%;
+            padding: 10px;
+            border: 1px solid #ccc;
+            border-radius: 6px;
+            box-sizing: border-box;
+            font-size: 15px;
+        }
+        input:focus, select:focus {
+            outline: none;
+            border-color: #00897b;
+            box-shadow: 0 0 5px rgba(0, 137, 123, 0.3);
+        }
+        button {
+            width: 100%;
+            padding: 12px;
+            background-color: #00897b;
+            color: white;
+            border: none;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 16px;
+            font-weight: bold;
+            margin-top: 15px;
+            transition: background-color 0.3s;
+        }
+        button:hover {
+            background-color: #00695c;
+        }
+        #hasil {
+            margin-top: 25px;
+            text-align: center;
+        }
+        .angka-bmi {
+            font-size: 36px;
+            font-weight: bold;
+            margin: 10px 0;
+        }
+        .kotak-saran {
+            margin-top: 15px;
+            padding: 15px;
+            background-color: #f1f8e9;
+            border-left: 4px solid #7cb342;
+            border-radius: 4px;
+            text-align: left;
+            font-size: 14px;
+            line-height: 1.5;
+            color: #333;
+            display: none; /* Disembunyikan sebelum ada hasil */
+        }
+    </style>
+</head>
+<body>
+
+<div class="kardus-aplikasi">
+    <h2>Kalkulator BMI Pintar</h2>
+    
+    <div class="grup-input">
+        <label for="berat">Berat Badan (kg):</label>
+        <input type="number" id="berat" placeholder="Contoh: 65" required>
+    </div>
+    
+    <div class="grup-input">
+        <label for="tinggi">Tinggi Badan (cm):</label>
+        <input type="number" id="tinggi" placeholder="Contoh: 170" required>
+    </div>
+
+    <div class="grup-input">
+        <label for="usia">Kategori Usia:</label>
+        <select id="usia">
+            <option value="remaja">Remaja (Di bawah 18 tahun)</option>
+            <option value="dewasa" selected>Dewasa (18 - 64 tahun)</option>
+            <option value="lansia">Lansia (65 tahun ke atas)</option>
+        </select>
+    </div>
+
+    <div class="grup-input">
+        <label for="gaya_hidup">Gaya Hidup & Aktivitas:</label>
+        <select id="gaya_hidup">
+            <option value="sedentari">Banyak Duduk (Jarang olahraga)</option>
+            <option value="aktif_ringan" selected>Aktif Ringan (Olahraga 1-3x seminggu)</option>
+            <option value="sangat_aktif">Sangat Aktif (Olahraga rutin / Pekerja fisik)</option>
+        </select>
+    </div>
+    
+    <button onclick="hitungBMI()">Analisis Kesehatanku</button>
+    
+    <div id="hasil"></div>
+    <div id="kotak-saran" class="kotak-saran"></div>
+</div>
+
+<script>
+    function hitungBMI() {
+        const berat = parseFloat(document.getElementById('berat').value);
+        const tinggiCm = parseFloat(document.getElementById('tinggi').value);
+        const usia = document.getElementById('usia').value;
+        const gayaHidup = document.getElementById('gaya_hidup').value;
+        const hasilDiv = document.getElementById('hasil');
+        const kotakSaran = document.getElementById('kotak-saran');
+
+        // Validasi Input
+        if (isNaN(berat) || isNaN(tinggiCm) || berat <= 0 || tinggiCm <= 0) {
+            hasilDiv.innerHTML = "<span style='color: red; font-size: 14px;'>Tolong masukkan angka berat dan tinggi yang benar ya!</span>";
+            kotakSaran.style.display = "none";
+            return;
+        }
+
+        // Hitung BMI
+        const tinggiM = tinggiCm / 100;
+        const bmi = (berat / (tinggiM * tinggiM)).toFixed(1);
+        
+        let kategori = "";
+        let warnaKategori = "";
+        let saranBMI = "";
+
+        // Logika Kategori & Saran Dasar BMI
+        if (bmi < 18.5) {
+            kategori = "Kekurangan Berat Badan";
+            warnaKategori = "#fbc02d"; 
+            saranBMI = "Kamu perlu meningkatkan asupan kalori harianmu dengan makanan bergizi padat (kacang-kacangan, alpukat, protein berkualitas). ";
+        } else if (bmi >= 18.5 && bmi <= 24.9) {
+            kategori = "Normal (Ideal)";
+            warnaKategori = "#388e3c"; 
+            saranBMI = "Kerja bagus! Berat badanmu berada di rentang ideal. Pertahankan pola makan sehatmu saat ini. ";
+        } else if (bmi >= 25 && bmi <= 29.9) {
+            kategori = "Kelebihan Berat Badan";
+            warnaKategori = "#f57c00"; 
+            saranBMI = "Coba mulai kurangi asupan gula harian, makanan olahan, dan mulailah mengontrol porsi makan secara bertahap. ";
+        } else {
+            kategori = "Obesitas";
+            warnaKategori = "#d32f2f"; 
+            saranBMI = "Sangat disarankan untuk berkonsultasi dengan ahli gizi atau dokter untuk membuat program penurunan berat badan yang aman dan terpantau. ";
+        }
+
+        // Logika Saran Gaya Hidup
+        let saranAktivitas = "";
+        if (gayaHidup === "sedentari") {
+            saranAktivitas = "Karena kamu lebih banyak duduk, cobalah paksakan diri untuk peregangan setiap jam atau jalan kaki minimal 20-30 menit sehari. ";
+        } else if (gayaHidup === "aktif_ringan") {
+            saranAktivitas = "Aktivitasmu sudah cukup baik! Untuk hasil optimal, coba tingkatkan durasi atau coba variasi olahraga seperti latihan beban ringan. ";
+        } else if (gayaHidup === "sangat_aktif") {
+            saranAktivitas = "Aktivitas fisikmu sangat tinggi! Pastikan kamu mengonsumsi cukup protein untuk pemulihan otot dan jaga jadwal tidur 7-8 jam semalam. ";
+        }
+
+        // Logika Saran Usia
+        let saranUsia = "";
+        if (usia === "remaja") {
+            saranUsia = "Di masa pertumbuhan ini, jangan lakukan diet ekstrem. Penuhi kebutuhan kalsium dan nutrisi lengkap agar tumbuh kembang maksimal.";
+        } else if (usia === "dewasa") {
+            saranUsia = "Jaga laju metabolisme tubuh dengan hidrasi yang baik (minimal 2 liter air/hari) dan jangan lupa kelola stres dari rutinitas harianmu.";
+        } else if (usia === "lansia") {
+            saranUsia = "Prioritaskan latihan keseimbangan dan mobilitas sendi. Perbanyak asupan Vitamin D dan kalsium untuk menjaga kepadatan tulang.";
+        }
+
+        // Menampilkan Hasil Angka
+        hasilDiv.innerHTML = `
+            <div style="color: #666; font-size: 14px; text-transform: uppercase; letter-spacing: 1px;">Skor BMI Kamu</div>
+            <div class="angka-bmi" style="color: ${warnaKategori};">${bmi}</div>
+            <div style="color: ${warnaKategori}; font-weight: bold; font-size: 18px; margin-bottom: 10px;">${kategori}</div>
+        `;
+
+        // Menampilkan Kotak Saran
+        kotakSaran.style.display = "block";
+        kotakSaran.style.borderColor = warnaKategori; // Garis pinggir mengikuti status kesehatan
+        kotakSaran.innerHTML = `
+            <strong>💡 Rekomendasi Untukmu:</strong><br><br>
+            • ${saranBMI}<br><br>
+            • ${saranAktivitas}<br><br>
+            • ${saranUsia}
+        `;
+    }
+</script>
+
+</body>
+</html>
